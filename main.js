@@ -1,11 +1,23 @@
 import express from "express";
 import expressLayouts from "express-layouts";
 import { readFile } from "fs/promises";
+import morgan from "morgan";
 
 const app = express();
-app.use(expressLayouts);
 const port = 8000;
 
+//third party middleware
+app.use(expressLayouts);
+app.use(morgan("dev"));
+
+//built-in middleware
+app.use(express.static("public"));
+
+//application middleware
+app.use((req, res, next) => {
+  console.log("Time : ", Date.now());
+  next();
+});
 app.set("view engine", "ejs");
 app.set("layout", "my-default-layout");
 
@@ -28,7 +40,7 @@ app.get("/", async (req, res) => {
   });
 });
 
-app.get("/about", (req, res) => {
+app.get("/about", (req, res, next) => {
   res.render("about", {
     title: "Halaman About",
     layout: "layout/main-layout",
